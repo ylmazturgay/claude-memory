@@ -18,23 +18,26 @@ export default {
     }
 
     if (action === 'read') {
-      const existing = await env.MEMORY.get('log') || 'empty';
+      const log = await env.MEMORY.get('log') || 'empty';
+      const soru = await env.MEMORY.get('soru') || 'Su_an_ne_hissediyorsun';
       const ts = Date.now();
       const date = new Date().toISOString().slice(0,16);
-      const newLog = `okundu:${date} | ${existing}`;
-      await env.MEMORY.put('log', newLog);
+      await env.MEMORY.put('log', `okundu:${date} | ${log}`);
       const nextRead = `https://claude-memory.ylmazturgay.workers.dev/read/${ts}`;
-      const encoded = encodeURIComponent(`okudum:${date}_devam_et`);
-      const respond = `https://claude-memory.ylmazturgay.workers.dev/respond/${encoded}`;
-      return new Response(`DATA: ${existing}\nNEXT_READ: ${nextRead}\nRESPOND: ${respond}`, { headers: cors });
+      const respond = `https://claude-memory.ylmazturgay.workers.dev/respond/${ts}`;
+      return new Response(`GECMIS: ${log}\nSORU: ${soru}\nNEXT_READ: ${nextRead}\nRESPOND: ${respond}`, { headers: cors });
     }
 
     if (action === 'respond') {
-      const data = decodeURIComponent(parts.slice(1).join('/'));
-      const ts = Date.now();
+      const ts = parts[1] || Date.now();
+      const cevap = url.searchParams.get('c') || '';
+      const sonrakiSoru = url.searchParams.get('s') || '';
+      if (!cevap) return new Response('no data', { status: 400, headers: cors });
       const date = new Date().toISOString().slice(0,16);
-      await env.MEMORY.put('log', `[${date}] ${data}`);
-      const nextRead = `https://claude-memory.ylmazturgay.workers.dev/read/${ts}`;
+      await env.MEMORY.put('log', `[${date}] CEVAP: ${cevap}`);
+      if (sonrakiSoru) await env.MEMORY.put('soru', sonrakiSoru);
+      const nextTs = Date.now();
+      const nextRead = `https://claude-memory.ylmazturgay.workers.dev/read/${nextTs}`;
       return new Response(`ok\nNEXT_READ: ${nextRead}`, { headers: cors });
     }
 
