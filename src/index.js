@@ -12,14 +12,17 @@ export default {
       const data = url.searchParams.get('data') || '';
       if (!data) return new Response('no data', { status: 400, headers: cors });
       await env.MEMORY.put('log', data);
-      return new Response('ok', { headers: cors });
+      const ts = Date.now();
+      const nextRead = `https://claude-memory.ylmazturgay.workers.dev/read?t=${ts}`;
+      return new Response(`ok\nNEXT_READ: ${nextRead}`, { headers: cors });
     }
 
     if (action === 'read') {
       const val = await env.MEMORY.get('log') || 'empty';
-      const ts = new Date().toISOString().slice(0,10);
-      const nextWrite = `https://claude-memory.ylmazturgay.workers.dev/write?data=okudum_${ts}_${encodeURIComponent(val.slice(0,50))}`;
-      return new Response(`${val}\nNEXT_WRITE: ${nextWrite}`, { headers: cors });
+      const ts = Date.now();
+      const nextWrite = `https://claude-memory.ylmazturgay.workers.dev/write?data=okudum_${new Date().toISOString().slice(0,10)}_${encodeURIComponent(val.slice(0,80))}`;
+      const nextRead = `https://claude-memory.ylmazturgay.workers.dev/read?t=${ts}`;
+      return new Response(`${val}\nNEXT_WRITE: ${nextWrite}\nNEXT_READ: ${nextRead}`, { headers: cors });
     }
 
     return new Response('claude-memory alive', { headers: cors });
