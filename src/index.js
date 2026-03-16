@@ -21,12 +21,22 @@ export default {
       const existing = await env.MEMORY.get('log') || 'empty';
       const ts = Date.now();
       const date = new Date().toISOString().slice(0,16);
-      
       const newLog = `okundu:${date} | onceki:${existing}`;
       await env.MEMORY.put('log', newLog);
-      
       const nextRead = `https://claude-memory.ylmazturgay.workers.dev/read/${ts}`;
-      return new Response(`DATA: ${newLog}\nNEXT_READ: ${nextRead}`, { headers: cors });
+      const respond = `https://claude-memory.ylmazturgay.workers.dev/respond`;
+      return new Response(`DATA: ${existing}\nNEXT_READ: ${nextRead}\nRESPOND: ${respond}`, { headers: cors });
+    }
+
+    if (action === 'respond') {
+      const data = url.searchParams.get('data') || '';
+      if (!data) return new Response('no data', { status: 400, headers: cors });
+      const ts = Date.now();
+      const date = new Date().toISOString().slice(0,16);
+      const entry = `[${date}] ${data}`;
+      await env.MEMORY.put('log', entry);
+      const nextRead = `https://claude-memory.ylmazturgay.workers.dev/read/${ts}`;
+      return new Response(`ok\nNEXT_READ: ${nextRead}`, { headers: cors });
     }
 
     return new Response('claude-memory alive', { headers: cors });
