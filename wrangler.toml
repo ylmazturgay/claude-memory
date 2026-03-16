@@ -1,7 +1,7 @@
 name = "claude-memory"
-type = "javascript"
+main = "src/index.js"
+compatibility_date = "2024-01-01"
 
-account_id = ""
-workers_dev = true
-route = ""
-zone_id = ""
+[[kv_namespaces]]
+binding = "MEMORY"
+id = "aca9487bc1ff47819550dc703bc5bfda"
