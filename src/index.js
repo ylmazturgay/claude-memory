@@ -1,7 +1,8 @@
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
-    const action = url.pathname.slice(1);
+    const parts = url.pathname.slice(1).split('/');
+    const action = parts[0];
 
     const cors = {
       'Access-Control-Allow-Origin': '*',
@@ -9,7 +10,7 @@ export default {
     };
 
     if (action === 'write') {
-      const data = url.searchParams.get('data');
+      const data = parts.slice(1).join('/');
       if (!data) return new Response('no data', { status: 400, headers: cors });
       await env.MEMORY.put('log', decodeURIComponent(data));
       return new Response('ok', { headers: cors });
