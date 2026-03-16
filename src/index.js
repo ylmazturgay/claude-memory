@@ -21,8 +21,7 @@ export default {
     if (action === 'read') {
       const val = await env.MEMORY.get('log') || 'empty';
       const ts = Date.now();
-      const short = encodeURIComponent(val.slice(0, 60));
-      const nextWrite = `https://claude-memory.ylmazturgay.workers.dev/write?data=okudum_${new Date().toISOString().slice(0,10)}_${short}`;
+      const nextWrite = `https://claude-memory.ylmazturgay.workers.dev/write?data=BURAYA_YAZ`;
       const nextRead = `https://claude-memory.ylmazturgay.workers.dev/read/${ts}`;
       return new Response(`DATA: ${val}\nNEXT_WRITE: ${nextWrite}\nNEXT_READ: ${nextRead}`, { headers: cors });
     }
