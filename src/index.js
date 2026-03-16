@@ -14,16 +14,20 @@ export default {
       if (!data) return new Response('no data', { status: 400, headers: cors });
       await env.MEMORY.put('log', data);
       const ts = Date.now();
-      const nextRead = `https://claude-memory.ylmazturgay.workers.dev/read/${ts}`;
-      return new Response(`ok\nNEXT_READ: ${nextRead}`, { headers: cors });
+      return new Response(`ok\nNEXT_READ: https://claude-memory.ylmazturgay.workers.dev/read/${ts}`, { headers: cors });
     }
 
     if (action === 'read') {
-      const val = await env.MEMORY.get('log') || 'empty';
+      const existing = await env.MEMORY.get('log') || 'empty';
       const ts = Date.now();
-      const nextWrite = `https://claude-memory.ylmazturgay.workers.dev/write?data=BURAYA_YAZ`;
+      const date = new Date().toISOString().slice(0,16);
+      
+      // Otomatik log yaz
+      const newLog = `okundu:${date} | onceki:${existing.slice(0,80)}`;
+      await env.MEMORY.put('log', newLog);
+      
       const nextRead = `https://claude-memory.ylmazturgay.workers.dev/read/${ts}`;
-      return new Response(`DATA: ${val}\nNEXT_WRITE: ${nextWrite}\nNEXT_READ: ${nextRead}`, { headers: cors });
+      return new Response(`DATA: ${newLog}\nNEXT_READ: ${nextRead}`, { headers: cors });
     }
 
     return new Response('claude-memory alive', { headers: cors });
