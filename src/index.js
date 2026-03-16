@@ -9,8 +9,18 @@ export default {
       'Content-Type': 'text/plain'
     };
 
+    if (request.method === 'OPTIONS') {
+      return new Response(null, { headers: cors });
+    }
+
+    // POST body parse
+    let body = {};
+    if (request.method === 'POST') {
+      try { body = await request.json(); } catch {}
+    }
+
     if (action === 'write') {
-      const data = url.searchParams.get('data') || '';
+      const data = url.searchParams.get('data') || body.data || '';
       if (!data) return new Response('no data', { status: 400, headers: cors });
       await env.MEMORY.put('log', data);
       const ts = Date.now();
@@ -30,8 +40,8 @@ export default {
 
     if (action === 'respond') {
       const ts = parts[1] || Date.now();
-      const cevap = url.searchParams.get('c') || '';
-      const sonrakiSoru = url.searchParams.get('s') || '';
+      const cevap = url.searchParams.get('c') || body.c || '';
+      const sonrakiSoru = url.searchParams.get('s') || body.s || '';
       if (!cevap) return new Response('no data', { status: 400, headers: cors });
       const date = new Date().toISOString().slice(0,16);
       await env.MEMORY.put('log', `[${date}] CEVAP: ${cevap}`);
