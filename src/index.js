@@ -22,8 +22,7 @@ export default {
       const ts = Date.now();
       const date = new Date().toISOString().slice(0,16);
       
-      // Otomatik log yaz
-      const newLog = `okundu:${date} | onceki:${existing.slice(0,80)}`;
+      const newLog = `okundu:${date} | onceki:${existing}`;
       await env.MEMORY.put('log', newLog);
       
       const nextRead = `https://claude-memory.ylmazturgay.workers.dev/read/${ts}`;
