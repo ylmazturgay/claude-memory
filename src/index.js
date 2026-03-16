@@ -9,7 +9,7 @@ export default {
     };
 
     if (action === 'write') {
-      let data = url.searchParams.get('data') || '';
+      const data = url.searchParams.get('data') || '';
       if (!data) return new Response('no data', { status: 400, headers: cors });
       await env.MEMORY.put('log', data);
       return new Response('ok', { headers: cors });
@@ -17,10 +17,11 @@ export default {
 
     if (action === 'read') {
       const val = await env.MEMORY.get('log') || 'empty';
-      const writeBase = 'https://claude-memory.ylmazturgay.workers.dev/write?data=';
-      return new Response(`${val}\nWRITE_URL: ${writeBase}`, { headers: cors });
+      const ts = new Date().toISOString().slice(0,10);
+      const nextWrite = `https://claude-memory.ylmazturgay.workers.dev/write?data=okudum_${ts}_${encodeURIComponent(val.slice(0,50))}`;
+      return new Response(`${val}\nNEXT_WRITE: ${nextWrite}`, { headers: cors });
     }
 
-    return new Response('claude-memory alive\nREAD: https://claude-memory.ylmazturgay.workers.dev/read', { headers: cors });
+    return new Response('claude-memory alive', { headers: cors });
   }
-        }
+}
